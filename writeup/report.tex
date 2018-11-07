@@ -1,0 +1,193 @@
+\documentclass[preprint]{aastex62}
+
+% \usepackage{minted}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{courier}
+\usepackage{cleveref}
+\usepackage{float}
+
+\definecolor{bcolor}{RGB}{0, 51, 153}
+\definecolor{gcolor}{RGB}{51, 153, 51}
+
+\shorttitle{astronomical spectroscopy}
+\shortauthors{j. birky}
+
+\begin{document}
+
+\title{\sc Lab 2: Astronomical Spectroscopy}
+\author{Jessica Birky, Julian Beaz-Gonzalez, Russell Van-Linge}
+
+\correspondingauthor{Jessica Birky (A13002163)}
+\email{jbirky@ucsd.edu}
+
+\begin{abstract}
+In this lab... 
+
+\end{abstract}
+\bigskip
+
+\section{Introduction} 
+Astronomical spectroscopy, components of spectrographs, types of spectrographs
+
+% ==================================
+\section{Observations} \label{sec:observations}
+Describe ocean lab and KAST spectrographs specifications and diagrams
+
+% ==================================
+\section{Data Reduction \& Methods} \label{sec:methods}
+Centroid routine, wavelength calibration, centroid error and calibration error
+
+Bias subtraction and normalization
+% \begin{figure}[H]
+% \plotone{plots/helium_reference.png}
+% \caption{\href{https://www.vernier.com/innovate/a-quantitative-investigation-of-the-helium-spectrum/}{https://www.vernier.com/innovate/a-quantitative-investigation-of-the-helium-spectrum/}} \label{fig:bias}
+% \end{figure}
+
+% ==================================
+\section{Data Analysis \& Modeling} \label{sec:analysis}
+Show centroids, wavelength calibration plots, application of wavelength solution, plots of astronomical spectra
+
+\begin{figure}[]
+\begin{center}
+\includegraphics[width=.49\linewidth]{plots/oceanlab_helium_thres.png}
+\includegraphics[width=.49\linewidth]{plots/oceanlab_neon_thres.png} \\
+\includegraphics[width=.49\linewidth]{plots/oceanlab_helium_centroids.png}
+\includegraphics[width=.49\linewidth]{plots/oceanlab_neon_centroids.png}
+\caption{Centroid finding routine.}
+\end{center}
+\end{figure}
+
+\begin{figure}[]
+\begin{center}
+\includegraphics[width=.46\linewidth]{plots/oceanlab_wavecal.png}
+\includegraphics[width=.46\linewidth]{plots/oceanlab_residual.png}
+\caption{Wavelength calibration for the Ocean Lab spectrometer.}
+\end{center}
+\end{figure}
+
+
+\begin{figure}[]
+\begin{center}
+\includegraphics[width=.31\linewidth]{plots/oceanlab_solar.png}
+\includegraphics[width=.31\linewidth]{plots/oceanlab_fluorescent.png}
+\includegraphics[width=.31\linewidth]{plots/oceanlab_lamp.png}
+\caption{Three spectra taken on the Ocean Lab Spectrometer: the Sun, a fluorescent light bulb, and an incandescent lamp. Wavelength scale determined by calibration with emission peaks in Helium and Neon lamps.}
+\end{center}
+\end{figure}
+
+% ==================================
+\section{Discussion} \label{sec:discussion}
+What kind of astronomical sources
+
+% ==================================
+\section{Conclusion}
+
+
+% ==================================
+\section{Author Contributions}
+
+
+% ==================================
+\newpage
+\section{Appendix}
+
+\lstset{language=Python,
+        basicstyle=\footnotesize\ttfamily,
+        keywordstyle=\color{blue},
+        numbers=left,
+        numberstyle=\ttfamily,
+        stringstyle=\color{red},
+        commentstyle=\color{gcolor},
+        morecomment=[l][\color{gray}]{\#}
+}
+
+\subsection{Centroid Identification Routine} \label{code:stats}
+\small
+\hrule
+\begin{lstlisting}
+def emission(data, **kwargs):
+    thres = kwargs.get('thres', 1)
+    
+    x, y = np.array(data[0]), np.array(data[1])
+    Npix = len(x)
+    
+    med = np.median(y)
+    std = np.std(y)
+    cut = med + thres*std
+    
+    count_cut = []
+    for i in range(Npix):
+        if y[i] >= cut:
+            count_cut.append(i)
+    
+    emission = []
+    arr = []
+    for i in range(len(count_cut)-1):
+        if (count_cut[i+1] - count_cut[i]) == 1:
+            arr.append(count_cut[i])
+        else:
+            arr.append(count_cut[i])
+            if len(arr) > 5:
+                emission.append(np.array(arr))
+            arr = []
+
+return np.array(emission)
+
+
+def centroid(data, feat_idx, **kwargs):
+    
+    x, y = np.array(data[0]), np.array(data[1])
+    Npix = len(x)
+    
+    max_idx = []
+    for feat in feat_idx:
+        for idx in feat:
+            if y[idx] == max(y[feat]):
+                max_idx.append(idx)
+                
+    return np.array(max_idx)
+
+centroid(data, emiss)
+\end{lstlisting}
+\hrule \vspace{7pt}
+
+\subsection{Centroid Error} \label{code:stats}
+\small
+\hrule
+\begin{lstlisting}
+#Produces float values for the centroids, calculating their error and width
+centroids, errors, widths, intensities = [], [], [], []
+for i in np.arange(len(cent)):
+    inte = []
+    for a in emiss[i]:
+        inte.append(data[1][a])
+    centr_f = sum(emiss[i]*inte)/sum(inte)
+    err_f = sum(inte*((emiss[i]-centr_f)**2))/(sum(inte))**2
+    width_f = sum(inte*((emiss[i]-centr_f)**2))/sum(inte)
+    
+    centroids.append(centr_f)
+    errors.append(err_f)
+    widths.append(width_f)
+    intensities.append(max(data[1][emiss[i]]))
+\end{lstlisting}
+\hrule \vspace{7pt}
+
+\subsection{Wavelength Calibration} \label{code:stats}
+\small
+\hrule
+\begin{lstlisting}
+def linear_regression(x, y):
+    
+    A = np.array([[np.sum(x**2), np.sum(x)], \
+                  [np.sum(x), len(x)]])
+    a = np.array([np.sum(x*y), np.sum(y)])
+
+    return np.dot(np.linalg.inv(A), a)
+\end{lstlisting}
+\hrule \vspace{7pt}
+
+
+
+\end{document}
+
