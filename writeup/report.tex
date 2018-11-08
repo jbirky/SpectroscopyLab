@@ -54,18 +54,45 @@ The KAST spectrograph has two different observing modes: a red arm and a blue ar
 \subsection{Data Collection}
 Using the Ocean lab spectrometer we collected spectra of five different sources: the sun, an incandescent light bulb, a fluorescent light bulb, a helium gas lamp, and a neon gas lamp, as well as bias frames taken in a dark room. For each source we colleced 100 frames of data.
 
-We also analyzed several astronomical spectra taken with KAST in 2013. Reduction for the KAST spectrograph requires three types of frames: the scientific frames, bias frames (measuring the )
+We also analyzed several astronomical spectra taken with KAST in 2013. Reduction for the KAST spectrograph requires three types of frames: the scientific frames, as well as bias frames (a zero second exposure capturing instrumental noise), and flat field frames (measuring the pixel-to-pixel
+response from the detector due to variations in quantum efficiency or optical path differences in the system) which are used for calibration. Table \ref{table:log} shows the observation log of frames used from the Shane public data repository.
+
+\begin{table}[H]
+    \begin{center}
+    \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    source     & RA       & DEC      & frame \# & \# frames & exposure time (sec) \\
+    \hline \hline
+    HeHgCd arclamp &     --   &    --    & 100      & 1         & 40                  \\
+    bias       &    --    &     --   & 101-110  & 10        & 0                   \\
+    flat field &    --    &     --   & 121-150  & 30        & 90                  \\
+    J0047+0319 & 0:47:34  & 3:25:55  & 155      & 1         & 1200                \\
+    BD+15233   & 1:34:31  & 15:51:42 & 156      & 1         & 90                  \\
+    Feige 110  & 23:20:35 & -5:02:03 & 160      & 1         & 120                 \\
+    \hline     
+    \end{tabular}
+    \end{center}
+\caption{Observation log of bias, flat field and science frames taken on KAST. Frame 100 arclamp is used for wavelength calibration, frame 101-110 bias frames are used for subtracting instrument noise, frame 121-150 dome flat frames are used for calibrating detector sensitivity at each pixel, and frames 155, 156, and 160 are three different astronomical sources.} \label{table:log}
+\end{table}
 
 % ==================================
 \section{Data Reduction \& Methods} \label{sec:methods}
 % Centroid routine, wavelength calibration, centroid error and calibration error
 % Bias subtraction and normalization
 \subsection{Reduction}
-For the Ocean Lab spectra, using the same procedure as Lab 1, we combined all 100 bias frames by taking the median at each pixel. Then for each frame of the solar, lamp spectras we subtracted the bias and combined into one reduced frame.
+For the Ocean Lab spectra, using the same procedure as Lab 1, we combined all 100 bias frames by taking the median at each pixel. Then for each frame of the solar, lamp spectras we subtracted the bias and combined into one reduced frame (lines $4-19$, Section \ref{code:reduction}).
 
+Reducing the KAST data to extract 1D spectrum arrays required several steps: (1) we combined all 10 bias frames (listed in Table \ref{table:log}) by taking the median value at each pixel (lines $15-19$ Section \ref{code:reduction}); (2) we computed the normalized flat image (lines $21-33$): 
+\begin{equation}
+    {\rm Flat_{norm} = (Dome - Bias)/Median(Dome - Bias)} 
+\end{equation}
+(3) we bias-subtracted the arclamp, dome flat, and science images, and divided each by the normalized flat field (lines $35-49$); (4) we sliced the 2D image along the spatial dimension to extract the region that contains the source and took the average across the spatial dimension to produce a 1D spectrum (photon counts in ADU vs. wavelength pixel index) shown in lines $51-62$.
 
 
 \subsection{Wavelength Calibration}
+The spectrograph outputs the photon counts as a function of wavelength in arbitrary pixel units, however we want to know the spectrum as a function of its electromagnetic wavelength. In order to do this we must come up with a function that converts pixel to wavelength. This is why we collect emission spectra of several gas lamps: if we know the pixel values of each emission peak, and we can theoretically compute the wavelength produced by an electron transition, then we can match pixel peaks to wavelength peaks and calibrate a solution.
+
+In this lab, we test a first-order polynomial fit ($y=mx+c$), which as we will see in the next section looks to describe the correlation well. Using least-squares regression we can fit the slope and intercept between our pixel array ($x$) and our wavelength array ($y$), each which contain $N$ elements. The best fit slope, intercept and fit errors are complete linear algebra operations to compute. Lines $1-20$ of Section \ref{code:wavecal} show the implementation of the following parameter and error equations:
 
 \begin{equation}
 \begin{bmatrix}
@@ -90,6 +117,27 @@ For the Ocean Lab spectra, using the same procedure as Lab 1, we combined all 10
 \begin{equation}
     \sigma_c^2 = \frac{\sigma^2 \sum_i x_i^2}{N\sum_i x_i^2 - \left(\sum_i x_i \right)^2}
 \end{equation}
+
+Two separate calibrations are performed for the Ocean Optics and KAST spectrographs. For the Ocean Optics we calibrate using Helium and Neon emission spectra, and for KAST we use the HeHgCd arclamp spectrum.
+
+\subsection{Centroid Indentification Routine}
+Lines $1-33$ of \ref{code:centroid} show our routine for indetifying emission features. The input to the function is a 2D array where the first element is the pixel array, and the second element is the photon count array. Given a certain `threshold' value the code finds the indices of all points that lie above a median + threshold*(standard deviation) cut (lines $17-20)$. From there it groups all indices into separate arrays if they are sequential (lines $22-31$), so each array represents a set of indices for one emission feature. To remove small noisy features and only keep those that are signficant, we require that the length of the array my be at least 5 pixels long to be included. We also attempted other methods to indentify centroids, such as taking the slope between adjacent points and finding the points where the slope significantly changes from positive to negative, however we ran into a lot of difficulty deciphering between noise and actual emissions, separating double peaked features, and automating how to find the base of the feature, and so we abandoned this method.
+
+Lines $39-50$ of \ref{code:centroid} shows the implementation of how we find the centroids and compute the root mean squared (rms) width and error of each emission:
+\begin{equation}
+    x_{\rm centroid} = \langle x \rangle = \frac{\sum_i x_i I_i}{\sum_i I_i} 
+\end{equation}
+\begin{equation}
+    s^2 = \frac{\sum_i (x_i - \langle x \rangle)^2 I_i}{\sum_i I_i} = \langle x^2 \rangle - \langle x \rangle^2
+\end{equation}
+Propagating the error for $\langle x \rangle$ as a function of each pixel and assuming Poisson statistics for the intensity distribution we can determine $\sigma_{\langle x \rangle}^2$:
+\begin{align}
+    \sigma_{\langle x \rangle}^2 
+    &= \sigma_{I_1}^2 \left(\frac{\partial \langle x \rangle}{\partial I_1} \right)^2
+    + ... + \sigma_{I_N}^2 \left(\frac{\partial \langle x \rangle}{\partial I_N} \right)^2
+    = \sum_i \sigma_{I_i}^2 \left(\frac{\partial \langle x \rangle}{\partial I_i} \right)^2 \\
+    &= \frac{\sum_j I_j (x_j - \langle x \rangle)^2}{\left(\sum_i I_i \right)^2}
+\end{align}
 
 % \begin{figure}[H]
 % \plotone{plots/helium_reference.png}
@@ -155,7 +203,10 @@ Show centroids, wavelength calibration plots, application of wavelength solution
 % ==================================
 \section{Discussion} \label{sec:discussion}
 % What kind of astronomical sources
-As seen in Figure
+As seen in Figure , the solar spectrum and lamp spectrum show the approximate profile of a blackbody. Blackbody radiation
+\begin{equation}
+    B_{\lambda}(T) = \frac{hc^3}{\lambda^5}\frac{1}{e^{hc/\lambda k_b T} - 1}
+\end{equation}
 
 % ==================================
 \section{Conclusion}
@@ -221,7 +272,7 @@ E), and we divided the tasks for this lab. I worked on writing a routine to isol
 \includegraphics[width=.31\linewidth]{plots/oceanlab_solar.png}
 \includegraphics[width=.31\linewidth]{plots/oceanlab_fluorescent.png}
 \includegraphics[width=.31\linewidth]{plots/oceanlab_lamp.png}
-\caption{Three spectra taken on the Ocean Lab Spectrometer: the Sun, a fluorescent light bulb, and an incandescent lamp. Wavelength scale determined by calibration with emission peaks in Helium and Neon lamps.} \label{fig:oceanlab_specs}
+\caption{Three spectra taken on the Ocean Lab Spectrometer: the Sun, a fluorescent light bulb, and an incandescent lamp. Wavelength scale determined by calibration with emission centroids in Helium and Neon lamps to known emission peaks from the NIST atomic line database.} \label{fig:oceanlab_specs}
 \end{center}
 \end{figure}
 
@@ -230,7 +281,7 @@ E), and we divided the tasks for this lab. I worked on writing a routine to isol
 \includegraphics[width=.31\linewidth]{plots/kast_bd15233.png}
 \includegraphics[width=.31\linewidth]{plots/kast_feige110.png}
 \includegraphics[width=.31\linewidth]{plots/kast_j00470319.png}
-\caption{Three astronomical spectra taken on the KAST spectrograph.} \label{fig:kast_specs}
+\caption{Three astronomical spectra taken on the KAST spectrograph: BD+15233, Feige 110, and J0047+0319.  Wavelength scale determined by calibration with emission centroids in HeHgCd arclamp spectra.} \label{fig:kast_specs}
 \end{center}
 \end{figure}
 % ==================================
@@ -248,7 +299,7 @@ E), and we divided the tasks for this lab. I worked on writing a routine to isol
 }
 
 \vspace{7pt} \hrule \vspace{7pt}
-\subsection{Centroid Identification Routine} \label{code:stats}
+\subsection{Centroid Identification Routine} \label{code:centroid}
 \small
 \hrule
 \begin{lstlisting}
@@ -307,7 +358,7 @@ for i in np.arange(len(cent)):
 \hrule \vspace{7pt}
 
 
-\subsection{Wavelength Calibration} \label{code:stats}
+\subsection{Wavelength Calibration} \label{code:wavecal}
 \small
 \hrule
 \begin{lstlisting}
@@ -335,7 +386,7 @@ def linear_regression(x, y):
 \hrule \vspace{7pt}
 
 
-\subsection{KAST Data Reduction} \label{code:stats}
+\subsection{KAST Data Reduction} \label{code:reduction}
 \small
 \hrule
 \begin{lstlisting}
