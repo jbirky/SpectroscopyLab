@@ -102,7 +102,7 @@ Reducing the KAST data to extract 1D spectrum arrays required several steps: (1)
 (3) we bias-subtracted the arclamp, dome flat, and science images, and divided each by the normalized flat field (lines $35-49$); (4) we sliced the 2D image along the spatial dimension to extract the region that contains the source and took the average across the spatial dimension to produce a 1D spectrum (photon counts in ADU vs. wavelength pixel index) shown in lines $51-62$. The final bias-stubtracted, normalized science images for BD+15233, Feige 110, and J0047+0319 are shown in \ref{fig:science_images}.
 
 
-\subsection{Wavelength Calibration}
+\subsection{Wavelength Calibration} \label{sec:wavecal}
 The spectrograph outputs the photon counts as a function of wavelength in arbitrary pixel units, however we want to know the spectrum as a function of its electromagnetic wavelength. In order to do this we must come up with a function that converts pixel to wavelength. This is why we collect emission spectra of several gas lamps: if we know the pixel values of each emission peak, and we can theoretically compute the wavelength produced by an electron transition, then we can match pixel peaks to wavelength peaks and calibrate a solution.
 
 In this lab, we test a first-order polynomial fit ($y=mx+c$), which as we will see in the next section looks to describe the correlation well. Using least-squares regression we can fit the slope and intercept between our pixel array ($x$) and our wavelength array ($y$), each which contain $N$ elements. The best fit slope, intercept and fit errors are complete linear algebra operations to compute. Lines $1-20$ of Section \ref{code:wavecal} show the implementation of the following parameter and error equations:
@@ -220,23 +220,43 @@ Since we noticed our centroid errors were of small magnitude ($10^{-3}-10^{-5}$)
 \caption{Centroid pixels for the KAST HeHgCd arclamp calibration spectrum. The corresponding wavelengths for each emission are matched by comparison to template spectrum found on the Lick Observatory website. Units for centroid intensity are ADU, and wavelengths are in nm.} \label{table:kast_centroids}
 \end{table}
 
-
+\newpage
 \subsection{Wavelength Solution}
+Figure \ref{fig:oceanlab_wavecal} shows the wavelength solution fit for the Ocean Optics spectrograph, using the linear regression procedure describe in Section \ref{sec:wavecal}. The slope of the fit is $m=0.3568 \pm 1.5\times10^{-15}$ pixels/nm and the intercept is $c=344.215 \pm 2.0\times10^{-12}$ nm. The residual plot to the right of Figure \ref{fig:oceanlab_wavecal} shows that the error of the fit for any point is not more than 4nm.
 
+Figure \ref{fig:kast_wavecal} shows the wavelength solution for KAST, the slope of the fit is $m=0.1549 \pm 3.8\times10^{-18}$ and the intercept is $c=329.25 \pm 3.5\times10^{-13}$. The residuals shown on the right plot are mostly less than 10nm, with one outlier point with an error more than 15nm.
+
+Figures \ref{fig:oceanlab_specs} and \ref{fig:kast_specs} show all of the science images for the two instruments plotted with their calibrated wavelengths.
 
 % ==================================
 \section{Discussion} \label{sec:discussion}
 % What kind of astronomical sources
-As seen in Figure , the solar spectrum and lamp spectrum show the approximate profile of a blackbody. Blackbody radiation
+As seen in Figure \ref{fig:oceanlab_specs}, the solar spectrum and lamp spectrum show the approximate profile of a blackbody (Figure \ref{fig:blackbody}). The photons emitted from a blackbody are due to photons excited in a material due to the thermal energy of an object, and the amount flux $B_\lambda$ is dependent only on the temperature of the source:
 \begin{equation}
     B_{\lambda}(T) = \frac{hc^3}{\lambda^5}\frac{1}{e^{hc/\lambda k_b T} - 1}
 \end{equation}
+For a blackbody spectrum, the peak wavelength and temperature are inversely proportionate (Wien's law):
+\begin{equation}
+    \lambda_m T = 3\times10^{-3}
+\end{equation}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.49\linewidth]{plots/blackbody.png}
+\caption{Spectral profiles of blackbodies at varying temperatures.} \label{fig:blackbody}
+\end{center}
+\end{figure}
+
+If the sun was a perfect blackbody it would have smooth profiles like Figure \ref{fig:blackbody}, however we notice there are many sharp dips in the spectrum. As stated by Kirchoff's laws of spectral formation, these features are due to low-density, cool gas which absorb energy from photons at discrete wavelengths, such as atoms/molecules in the atmosphere of the star and Earth.
+
+In Figure \ref{fig:kast_specs} we see that BD+15233 has very sharp absorption features, Feige 110 has a few small absoroption and emission features, and J0047+0319 shows three very strong emission lines. Looking through the literature\footnote{\href{simbad.u-strasbg.fr}{simbad.u-strasbg.fr}}, we find that BD+15233 is an F0 star, and Feige 110 is a hot (blue) subdwarf. The blackbody predicted temperature for BD+15233 would be around 7000K, given that the peak wavelength is between $400-440$nm, which is within the temperature range of an F star (about $6000-75000$K). We also see that Feige 110 peaks mostly strongly in the blue region.
+% \footnote{\href{http://simbad.u-strasbg.fr/simbad/sim-id?Ident=BD%2B15233%2C&NbIdent=1&Radius=2&Radius.unit=arcmin&submit=submit+id}{http://simbad.u-strasbg.fr/simbad/sim-id?Ident=BD\%2B15233\%2C\&NbIdent=1\&Radius=2\&Radius.unit=arcmin\&submit=submit+id}}
 
 % ==================================
 \section{Conclusion}
-In conclusion we find the wavelength solution for the Ocean Optics spectrometer to be
-
-However further analysis into the physics of the solar or lamp spectra taken on the Ocean Optics spectrograph would require correcting for detector biases.
+In conclusion we find the wavelength solution for the Ocean Optics spectrometer to be $\lambda=.3568(\mathrm{pixel})+344.21$ nm and  $\lambda=.1549(\mathrm{pixel})+329.25$ nm for the KAST spectrometer.
+Knowing the sources behind spectral formation due to Kirchoff's laws allows us to infer a lot of information about the conditions (such as temperatures and chemical compositions) of stars, galaxies and other astronomical objects that we can observe from very far away.
+While further analysis into the physics of the solar or lamp spectra taken on the Ocean Optics spectrograph would require correcting for detector biases (such as pixel dependent quantum efficiency variantion), we are still able to clearly see that the sun is nearly a blackbody with atmospheric absorptions.
 
 % ==================================
 \section{Author Contributions}
