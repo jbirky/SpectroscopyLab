@@ -16,33 +16,57 @@
 \begin{document}
 
 \title{\sc Lab 2: Astronomical Spectroscopy}
-\author{Jessica Birky, Julian Beaz-Gonzalez, Russell Van-Linge}
+\author{Jessica Birky, Julian Beas-Gonzalez, Russell Van-Linge}
 
 \correspondingauthor{Jessica Birky (A13002163)}
 \email{jbirky@ucsd.edu}
 
 \begin{abstract}
-In this lab... 
+In this lab we determine the wavelength calibration for two different spectrographs: the Ocean Optics USB 2000 fiber optic spectrograph, and the KAST spectrograph mounted at Lick Observatory. Using spectra of several gas lamps (Helium, Neon, and HeHgCd), we compare the pixel values of emission centroids to theoretical emission wavelengths to determine pixel-to-wavelength conversion solutions of $\lambda=.3568(\mathrm{pixel})+344.21$ nm for the Ocean Optics instrument and  $\lambda=.1549(\mathrm{pixel})+329.25$ nm, using linear least-squares regression. We also compute the errors for each emission peak, and find that the error roughly decreases by a 1/$\sqrt{n}$ trend, with higher lower intensity peaks having higher errors. Finally, applying our calibration to spectra from several different light sources (incandescent and fluorescent bulbs) and astronomical sources (the Sun, BD+15233, Feige 110, and J0047+0319) we draw conclusions about how these spectra were formed based off of Kirchoff's laws of spectral formation.
 
 \end{abstract}
 \bigskip
 
 \section{Introduction} 
 % Astronomical spectroscopy, components of spectrographs, types of spectrographs
-Kirchoff's laws of spectral formation state that there are three different types of 
+A spectrum measures the flux of photons coming from a source as a function of wavelength. Kirchoff's laws of spectral formation characterizes the three different ways a spectrum can be created: (1) a hot opaque body or dense gas (such as a black body) will produce a continuous spectrum; (2) a hot transparent, low-density gas will produce an emission line spectrum; and (3) a cool, transparent, low-density gas will produce an absorption line spectrum.
 
-Section \ref{sec:observations} covers the schematics and specifications of two different spectrographs: the Ocean Lab spectrometer, and the KAST spectrograph mounted on the Shane 3m Telescope on Lick Observatory.
+In Lab 1 we learned about the properties of charged coupled device (CCD) detectors, and how we can measure the number of photon counts over two spatial dimensions. This lab add several other layers of instrumentation which allow us to disperse light taken over a narrow slit across a region of wavelengths, producing a two-dimensional (1 spatial dimension $\times$ 1 wavelength dimension) image of a source. \color{red}{gratings/grisms, collimator, detector setup...}\color{black}
+
+In particular, this lab seeks to classify several different types of spectrum taken from every day sources (such as incandescent/fluorescent lights and the Sun), gas lamps (such as Helium, Neon, and HeHgCd gas), and several astronomical sources.
+Section \ref{sec:observations} covers the particular schematics and specifications of two different spectrographs: the Ocean Lab spectrometer (which we use to take the spectra of every day sources), and the KAST spectrograph mounted on the Shane 3m Telescope on Lick Observatory (which we use to study astronomical sources). 
 
 
 % ==================================
 \section{Observations} \label{sec:observations}
-Describe ocean lab and KAST spectrographs specifications and diagrams
+% Describe ocean lab and KAST spectrographs specifications and diagrams
+\subsection{Spectrographs}
+The KAST spectrograph has two different observing modes: a red arm and a blue arm.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.49\linewidth]{plots/oceanlab_schematic.jpeg}
+\includegraphics[width=.49\linewidth]{plots/kast_schematic.png} 
+\caption{Schematic of two spectrographs: Ocean Optics USB 2000 (left) and KAST (right).}
+\end{center}
+\end{figure}
+
+\subsection{Data Collection}
+Using the Ocean lab spectrometer we collected spectra of five different sources: the sun, an incandescent light bulb, a fluorescent light bulb, a helium gas lamp, and a neon gas lamp, as well as bias frames taken in a dark room. For each source we colleced 100 frames of data.
+
+We also analyzed several astronomical spectra taken with KAST in 2013. Reduction for the KAST spectrograph requires three types of frames: the scientific frames, bias frames (measuring the )
 
 % ==================================
 \section{Data Reduction \& Methods} \label{sec:methods}
-Centroid routine, wavelength calibration, centroid error and calibration error
+% Centroid routine, wavelength calibration, centroid error and calibration error
+% Bias subtraction and normalization
+\subsection{Reduction}
+For the Ocean Lab spectra, using the same procedure as Lab 1, we combined all 100 bias frames by taking the median at each pixel. Then for each frame of the solar, lamp spectras we subtracted the bias and combined into one reduced frame.
 
-Bias subtraction and normalization
+
+
+\subsection{Wavelength Calibration}
+
 \begin{equation}
 \begin{bmatrix}
     m \\ c
@@ -80,7 +104,7 @@ Show centroids, wavelength calibration plots, application of wavelength solution
     \begin{center}
     \begin{tabular}{|c|c|c|c|c|}
     \hline
-    spec\_pixel & spec\_intensity (ADU) & nist\_wave (nm) & nist\_intensity & element \\
+    spec\_pixel & spec\_intensity (ADU) & nist\_wave (nm) & nist\_intensity & gas element \\
     \hline \hline
     132.3649283 & 236.48          & 388        & 60-300          & He      \\
     288.9587617 & 249.46          & 447        & 25-200          & He      \\
@@ -108,92 +132,30 @@ Show centroids, wavelength calibration plots, application of wavelength solution
 
 \begin{table}[H]
     \begin{center}
-    \begin{tabular}{|c|c|c|}
+    \begin{tabular}{|c|c|c|c|}
     \hline
-    spec\_pixel & spec\_intensity & ref\_wave \\
+    spec\_pixel & spec\_intensity & ref\_wave & gas molecule \\
     \hline \hline
-    23.50092286 & 30772.15763     & 326.105   \\
-    184.1577234 & 37829.79081     & 361.051   \\
-    229.5492333 & 40120.66215     & 365.015   \\
-    477.9985327 & 11444.21891     & 404.656   \\
-    639.6619601 & 30172.47648     & 435.833   \\
-    949.4331504 & 35609.38425     & 479.992   \\
-    1257.08592  & 5622.686548     & 505.882   \\
-    1372.254406 & 10136.48802     & 546.074   \\
-    1638.903321 & 10132.41605     & 587.562   \\
+    23.50092286 & 30772.15763     & 326.105   & HeHgCd  \\
+    184.1577234 & 37829.79081     & 361.051   & HeHgCd  \\
+    229.5492333 & 40120.66215     & 365.015   & HeHgCd  \\
+    477.9985327 & 11444.21891     & 404.656   & HeHgCd  \\
+    639.6619601 & 30172.47648     & 435.833   & HeHgCd  \\
+    949.4331504 & 35609.38425     & 479.992   & HeHgCd  \\
+    1257.08592  & 5622.686548     & 505.882   & HeHgCd  \\
+    1372.254406 & 10136.48802     & 546.074   & HeHgCd  \\
+    1638.903321 & 10132.41605     & 587.562   & HeHgCd  \\
     \hline
     \end{tabular}
     \end{center}
 \end{table}
 
-% ===================
-\begin{figure}[]
-\begin{center}
-\includegraphics[width=.49\linewidth]{plots/oceanlab_helium_thres.png}
-\includegraphics[width=.49\linewidth]{plots/oceanlab_neon_thres.png} \\
-\includegraphics[width=.49\linewidth]{plots/oceanlab_helium_centroids.png}
-\includegraphics[width=.49\linewidth]{plots/oceanlab_neon_centroids.png}
-\caption{Centroid finding routine.}
-\end{center}
-\end{figure}
 
-\begin{figure}[]
-\begin{center}
-\includegraphics[width=.49\linewidth]{plots/kast_arclamp_thres.png} \\
-\includegraphics[width=.49\linewidth]{plots/kast_arclamp_centroids.png} 
-\caption{Centroid finding routine.}
-\end{center}
-\end{figure}
-
-% ===================
-\begin{figure}[]
-\begin{center}
-\includegraphics[width=.46\linewidth]{plots/oceanlab_wavecal.png}
-\includegraphics[width=.46\linewidth]{plots/oceanlab_residual.png}
-\caption{Wavelength calibration for the Ocean Lab spectrometer.}
-\end{center}
-\end{figure}
-
-\begin{figure}[]
-\begin{center}
-\includegraphics[width=.46\linewidth]{plots/kast_wavecal.png}
-\includegraphics[width=.46\linewidth]{plots/kast_residual.png}
-\caption{Wavelength calibration for the KAST spectrometer.}
-\end{center}
-\end{figure}
-
-% ===================
-\begin{figure}[]
-\begin{center}
-\includegraphics[width=.46\linewidth]{plots/oceanlab_error_vs_intensity2.png}
-\includegraphics[width=.46\linewidth]{plots/oceanlab_error_vs_intensity.png}
-\caption{Error vs. Intensity.}
-\end{center}
-\end{figure}
-
-% ===================
-% Science images
-\begin{figure}[]
-\begin{center}
-\includegraphics[width=.31\linewidth]{plots/oceanlab_solar.png}
-\includegraphics[width=.31\linewidth]{plots/oceanlab_fluorescent.png}
-\includegraphics[width=.31\linewidth]{plots/oceanlab_lamp.png}
-\caption{Three spectra taken on the Ocean Lab Spectrometer: the Sun, a fluorescent light bulb, and an incandescent lamp. Wavelength scale determined by calibration with emission peaks in Helium and Neon lamps.}
-\end{center}
-\end{figure}
-
-\begin{figure}[]
-\begin{center}
-\includegraphics[width=.31\linewidth]{plots/kast_bd15233.png}
-\includegraphics[width=.31\linewidth]{plots/kast_feige110.png}
-\includegraphics[width=.31\linewidth]{plots/kast_j00470319.png}
-\caption{Three astronomical spectra taken on the KAST spectrograph.}
-\end{center}
-\end{figure}
 
 % ==================================
 \section{Discussion} \label{sec:discussion}
-What kind of astronomical sources
+% What kind of astronomical sources
+As seen in Figure
 
 % ==================================
 \section{Conclusion}
@@ -201,8 +163,76 @@ What kind of astronomical sources
 
 % ==================================
 \section{Author Contributions}
+This project was done in collaboration with Julian Beas-Gonzalez and Russell Van-Linge (Group
+E), and we divided the tasks for this lab. I worked on writing a routine to isolate arrays that contain emission features in the gas lamp spectra, match lines to the Helium and HeHgCd spectra, and perform and apply the wavelength calibration using linear regression. Julian worked on computing the centroids and errors (including improving the code to get sub-pixel centroids), and matching lines to the Neon spectrum for calibration. Russell worked on reducing the 2D KAST images (bias subtraction, normalization, and slicing) to produce 1D spectra, and tested alternative centroid identification methods. Besides manually matching arclamp centroids to NIST/template spectrum, our code is fully automated.
 
+% ===================
+% Figures
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.8\linewidth]{plots/kast_science_imgs.png} 
+\caption{Bias-subtracted, normalized, 2D images of three different spectra taken on the KAST spectrograph: BD+15233, Feige 110, and J0047+0319. X-axis shows the wavelength dimension, y-axis shows the spatial dimension. Horizontal white line marks the source, and vertical white lines mark emission features in Earth's atmosphere. Dark bands across the source are absorption features.} \label{fig:science_images}
+\end{center}
+\end{figure}
 
+% ===================
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.49\linewidth]{plots/oceanlab_helium_thres.png}
+\includegraphics[width=.49\linewidth]{plots/oceanlab_neon_thres.png} \\
+\includegraphics[width=.49\linewidth]{plots/oceanlab_helium_centroids.png}
+\includegraphics[width=.49\linewidth]{plots/oceanlab_neon_centroids.png} \\
+\includegraphics[width=.49\linewidth]{plots/kast_arclamp_thres.png} \\
+\includegraphics[width=.49\linewidth]{plots/kast_arclamp_centroids.png} 
+\caption{Centroid finding routine.} \label{fig:centoid}
+\end{center}
+\end{figure}
+
+% ===================
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.46\linewidth]{plots/oceanlab_wavecal.png}
+\includegraphics[width=.46\linewidth]{plots/oceanlab_residual.png}
+\caption{Wavelength calibration for the Ocean Optics spectrometer. Here we determine the pixel-to-wavelength conversion to be $\lambda=.3568(\mathrm{pixel})+344.21$ nm (left). Lack of obvious correlations in the residual plot (right) indicates that a first order polynomial fit is sufficient for describing the wavelength-pixel relationship.} \label{fig:oceanlab_wavecal}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.46\linewidth]{plots/kast_wavecal.png}
+\includegraphics[width=.46\linewidth]{plots/kast_residual.png}
+\caption{Wavelength calibration for the KAST spectrometer. Here we determine the pixel-to-wavelength conversion to be $\lambda=.1549(\mathrm{pixel})+329.25$ nm (left). Lack of obvious correlations in the residual plot (right) indicates that a first order polynomial fit is sufficient for describing the wavelength-pixel relationship.} \label{fig:kast_wavecal}
+\end{center}
+\end{figure}
+
+% ===================
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.46\linewidth]{plots/oceanlab_error_vs_intensity2.png}
+\includegraphics[width=.46\linewidth]{plots/oceanlab_error_vs_intensity.png}
+\caption{Error vs. Intensity at centroid of each identified emission peak. We see that the majority of point generally appear to lie along 1/$\sqrt{n}$ pattern, with some outliers.} \label{fig:error_vs_intensity}
+\end{center}
+\end{figure}
+
+% ===================
+% Science images
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.31\linewidth]{plots/oceanlab_solar.png}
+\includegraphics[width=.31\linewidth]{plots/oceanlab_fluorescent.png}
+\includegraphics[width=.31\linewidth]{plots/oceanlab_lamp.png}
+\caption{Three spectra taken on the Ocean Lab Spectrometer: the Sun, a fluorescent light bulb, and an incandescent lamp. Wavelength scale determined by calibration with emission peaks in Helium and Neon lamps.} \label{fig:oceanlab_specs}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.31\linewidth]{plots/kast_bd15233.png}
+\includegraphics[width=.31\linewidth]{plots/kast_feige110.png}
+\includegraphics[width=.31\linewidth]{plots/kast_j00470319.png}
+\caption{Three astronomical spectra taken on the KAST spectrograph.} \label{fig:kast_specs}
+\end{center}
+\end{figure}
 % ==================================
 \newpage
 \section{Appendix}
@@ -217,6 +247,7 @@ What kind of astronomical sources
         morecomment=[l][\color{gray}]{\#}
 }
 
+\vspace{7pt} \hrule \vspace{7pt}
 \subsection{Centroid Identification Routine} \label{code:stats}
 \small
 \hrule
@@ -249,7 +280,7 @@ def emission(data, **kwargs):
             arr.append(count_cut[i])
         else:
             arr.append(count_cut[i])
-            if len(arr) > 5:
+            if len(arr) > 5:    # only keep arrays that have >5 pixels
                 emission.append(np.array(arr))
             arr = []
 
@@ -327,15 +358,6 @@ def combineFrame(data_array):
     Avergaes the 3D into 2D array
     '''
     return np.median(data_array,axis=0)
-
-def slit_size(data = 'fits_file'):
-    '''
-    takes a fits file and finds the slit sized used
-    '''
-    dt = fits.open(data)
-    header = dt[0].header
-    print(header['SLIT_N'])
-    
     
 def norm_flat(bias_folder,flat_folder):
     '''
