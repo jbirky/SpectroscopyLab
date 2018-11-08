@@ -38,6 +38,12 @@ def linear_regression(x, y):
 
 
 def emission(data, **kwargs):
+	"""
+	Input:  'data': 2D array [x,y]
+			'thres': standard deviation threshold
+	Output: 'emission': an array of arrays which contain the index of 
+				each emission which lies above some threshold cut
+	"""
     thres = kwargs.get('thres', 1)
     
     x, y = np.array(data[0]), np.array(data[1])
@@ -84,6 +90,10 @@ def emission(data, **kwargs):
 
 
 def centroid(data, feat_idx, **kwargs):
+	"""
+	Input:  'data': 2D array [x,y]
+			'feat_idx': list of arrays which are the indices of emission features
+	"""
     
     x, y = np.array(data[0]), np.array(data[1])
     Npix = len(x)
