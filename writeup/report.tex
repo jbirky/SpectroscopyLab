@@ -29,9 +29,20 @@ In this lab we determine the wavelength calibration for two different spectrogra
 
 \section{Introduction} 
 % Astronomical spectroscopy, components of spectrographs, types of spectrographs
-A spectrum measures the flux of photons coming from a source as a function of wavelength. Kirchoff's laws of spectral formation characterizes the three different ways a spectrum can be created: (1) a hot opaque body or dense gas (such as a black body) will produce a continuous spectrum; (2) a hot transparent, low-density gas will produce an emission line spectrum; and (3) a cool, transparent, low-density gas will produce an absorption line spectrum.
+A spectrum measures the flux of photons coming from a source as a function of wavelength. Kirchoff's laws of spectral formation characterizes the three different ways a spectrum can be created: (1) a hot opaque body or dense gas (such as a black body) will produce a continuous spectrum; (2) a hot transparent, low-density gas will produce an emission line spectrum; and (3) a cool, transparent, low-density gas will produce an absorption line spectrum. 
 
-In Lab 1 we learned about the properties of charged coupled device (CCD) detectors, and how we can measure the number of photon counts over two spatial dimensions. This lab add several other layers of instrumentation which allow us to disperse light taken over a narrow slit across a region of wavelengths, producing a two-dimensional (1 spatial dimension $\times$ 1 wavelength dimension) image of a source. \color{red}{gratings/grisms, collimator, detector setup...}\color{black}
+In Lab 1 we learned about the properties of charged coupled device (CCD) detectors, and how we can measure the number of photon counts over two spatial dimensions. This lab add several other layers of instrumentation which allow us to disperse light taken over a narrow slit across a region of wavelengths, producing a two-dimensional (1 spatial dimension $\times$ 1 wavelength dimension) image of a source. The key component behind spectroscopy is the addition of a diffraction grating (or grating prism called a grism), shown in Figure \ref{fig:grating}, which causes rays of light at different wavelengths to be split at different angles, as given by the grating equation:
+
+\begin{equation}
+    \frac{m\lambda}{d} = \sin\alpha + \sin\beta
+\end{equation}
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=.35\linewidth]{plots/diffraction_grating.jpg}
+\caption{Diagram of a diffraction grating. Light rays hit the grating with angle of incidence $\alpha$ and are reflected with angle $\beta$. The spacing between the grooves of the grating is $d$.} \label{fig:grating}
+\end{center}
+\end{figure}
 
 In particular, this lab seeks to classify several different types of spectrum taken from every day sources (such as incandescent/fluorescent lights and the Sun), gas lamps (such as Helium, Neon, and HeHgCd gas), and several astronomical sources.
 Section \ref{sec:observations} covers the particular schematics and specifications of two different spectrographs: the Ocean Lab spectrometer (which we use to take the spectra of every day sources), and the KAST spectrograph mounted on the Shane 3m Telescope on Lick Observatory (which we use to study astronomical sources). 
@@ -41,13 +52,15 @@ Section \ref{sec:observations} covers the particular schematics and specificatio
 \section{Observations} \label{sec:observations}
 % Describe ocean lab and KAST spectrographs specifications and diagrams
 \subsection{Spectrographs}
-The KAST spectrograph has two different observing modes: a red arm and a blue arm.
+The KAST spectrograph is a double slit spectrograph which has two different observing modes: a red arm with 7 different grisms and a blue arm with 3 different grisms. The image to the right of Figure \ref{fig:schematic} shows the schematic of the instrument: (1) light from an astronomical source enters the slit at point a, (2) a filter wheel and beamsplitting mirror determine if the light will pass on to the blue or red detector at points b and c, (3) the light goes through a collimator which receives angled light rays and returns parallel rays, (4) a grating or grism is used to disperse light into its separate wavlength components, and (5) the light passes through a camera and finally a CCD detector which counts the number of photons collected in Analog to Digital Units (ADU).
 
-\begin{figure}[H]
+The Ocean Optics spectrograph is a simpler version of the KAST spectrograph: (1) light comes into the entrance aperature at point 1 via a fiber-optics cable, (2) a collimating mirror reflects the light into parallel beams at point 4, (3) the diffration grating at point 5 splits the light into separate wavelenths, (4) the the camera mirror reflects the light onto the CCD detector at point 8.
+
+\begin{figure}[]
 \begin{center}
 \includegraphics[width=.49\linewidth]{plots/oceanlab_schematic.jpeg}
 \includegraphics[width=.49\linewidth]{plots/kast_schematic.png} 
-\caption{Schematic of two spectrographs: Ocean Optics USB 2000 (left) and KAST (right).}
+\caption{Schematic of two spectrographs: Ocean Optics USB 2000 (left) and KAST (right).} \label{fig:schematic}
 \end{center}
 \end{figure}
 
@@ -86,7 +99,7 @@ Reducing the KAST data to extract 1D spectrum arrays required several steps: (1)
 \begin{equation}
     {\rm Flat_{norm} = (Dome - Bias)/Median(Dome - Bias)} 
 \end{equation}
-(3) we bias-subtracted the arclamp, dome flat, and science images, and divided each by the normalized flat field (lines $35-49$); (4) we sliced the 2D image along the spatial dimension to extract the region that contains the source and took the average across the spatial dimension to produce a 1D spectrum (photon counts in ADU vs. wavelength pixel index) shown in lines $51-62$.
+(3) we bias-subtracted the arclamp, dome flat, and science images, and divided each by the normalized flat field (lines $35-49$); (4) we sliced the 2D image along the spatial dimension to extract the region that contains the source and took the average across the spatial dimension to produce a 1D spectrum (photon counts in ADU vs. wavelength pixel index) shown in lines $51-62$. The final bias-stubtracted, normalized science images for BD+15233, Feige 110, and J0047+0319 are shown in \ref{fig:science_images}.
 
 
 \subsection{Wavelength Calibration}
@@ -120,7 +133,7 @@ In this lab, we test a first-order polynomial fit ($y=mx+c$), which as we will s
 
 Two separate calibrations are performed for the Ocean Optics and KAST spectrographs. For the Ocean Optics we calibrate using Helium and Neon emission spectra, and for KAST we use the HeHgCd arclamp spectrum.
 
-\subsection{Centroid Indentification Routine}
+\subsection{Centroid Indentification Routine} \label{subsec:centroid}
 Lines $1-33$ of \ref{code:centroid} show our routine for indetifying emission features. The input to the function is a 2D array where the first element is the pixel array, and the second element is the photon count array. Given a certain `threshold' value the code finds the indices of all points that lie above a median + threshold*(standard deviation) cut (lines $17-20)$. From there it groups all indices into separate arrays if they are sequential (lines $22-31$), so each array represents a set of indices for one emission feature. To remove small noisy features and only keep those that are signficant, we require that the length of the array my be at least 5 pixels long to be included. We also attempted other methods to indentify centroids, such as taking the slope between adjacent points and finding the points where the slope significantly changes from positive to negative, however we ran into a lot of difficulty deciphering between noise and actual emissions, separating double peaked features, and automating how to find the base of the feature, and so we abandoned this method.
 
 Lines $39-50$ of \ref{code:centroid} shows the implementation of how we find the centroids and compute the root mean squared (rms) width and error of each emission:
@@ -146,58 +159,69 @@ Propagating the error for $\langle x \rangle$ as a function of each pixel and as
 
 % ==================================
 \section{Data Analysis \& Modeling} \label{sec:analysis}
-Show centroids, wavelength calibration plots, application of wavelength solution, plots of astronomical spectra
+% Show centroids, wavelength calibration plots, application of wavelength solution, plots of astronomical spectra
+\subsection{Centroid Routine Application}
+Figure \ref{fig:centoid} illustrates how we apply our centroid identification routine described in Section \ref{subsec:centroid}. On the top plots of each of the three panels, the blue horizontal line shows the median photon count (ADU) and the red horizontal line shows the threshold cuts chosen for identifying emissions. Each threshold was chosen by eye such that the red line cut the spectrum close to the bas of most emission features. The bottom plot of the three panels shows the centroid pixel plotted which the code identifies with green vertical lines.
+
+Tables \ref{table:kast_centroids} and \ref{table:oceanlab_centroids} give the centroid pixel values we computed and their corresponding intensity levels. For the Ocean Optics calibration we compared matched pixels to wavelengths using lines from the NIST atomic line database\footnote{\href{https://www.nist.gov/pml/atomic-spectra-database}{https://www.nist.gov/pml/atomic-spectra-database}}. As a visual guide we also compared our helium emissions to a graph of a spectrum with identified lines\footnote{\href{https://www.vernier.com/innovate/a-quantitative-investigation-of-the-helium-spectrum/}{https://www.vernier.com/innovate/a-quantitative-investigation-of-the-helium-spectrum/}}, since it was difficult to tell from NIST alone if the intensities matched up with our measurements. For the KAST calibration we visually compared our emissions the arclamp templates found on the website\footnote{\href{https://mthamilton.ucolick.org/techdocs/instruments/kast/images/Kastblue600HeHgCd.jpg}{https://mthamilton.ucolick.org/techdocs/instruments/kast/images/Kastblue600HeHgCd.jpg}}, particularly the template for the blue 600/4310 grism HeHgCd arclamp.
+
+Since we noticed our centroid errors were of small magnitude ($10^{-3}-10^{-5}$) range, we checked to see if the size of the error depended on the magnitude of the intensity, to see if sharper, higher intensity peaks had smaller error. Figure \ref{fig:error_vs_intensity} shows that most of the points with higher errors have lower intensities, with a roughly 1$\sqrt{n}$ relationship, which matches the pattern we found in the previous lab.
+
+
+\begin{table}[H]
+    \begin{center}
+    \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    centroid pixel & centroid intensity & centroid error & nist wave & nist intensity & gas element \\
+    \hline \hline
+    132.3649283 & 236.48          & 0.001898        & 388        & 60-300          & He      \\
+    288.9587617 & 249.46          & 0.002074        & 447        & 25-200          & He      \\
+    412.1908462 & 98.46           & 0.005039        & 492        & 20              & He      \\
+    437.7643945 & 271.16          & 0.001998        & 501        & 100             & He      \\
+    677.5521828 & 3106.25         & 0.000248        & 588        & 120-500         & He      \\
+    908.0143522 & 564.74          & 0.001505        & 668        & 200             & He      \\
+    1021.697778 & 867.6           & 0.001039        & 706        & 20-100          & He      \\
+    673.712     & 1696.45         & 0.001759        & 585.25     & 200             & Ne      \\
+    700.126     & 617.38          & 0.0045          & 594.48     & 50              & Ne      \\
+    722.492     & 181.31          & 0.003963        & 602.99     & 100             & Ne      \\
+    747.974     & 1339.68         & 0.005689        & 614.3      & 100             & Ne      \\
+    775.796     & 290.88          & 0.003017        & 621.73     & 100             & Ne      \\
+    820.02      & 3428.72         & 0.005194        & 640.22     & 200             & Ne      \\
+    860.822     & 1265.04         & 0.001739        & 650.65     & 150             & Ne      \\
+    886.09      & 419.28          & 0.002222        & 659.9      & 100             & Ne      \\
+    913.44      & 767.24          & 0.005151        & 667.82     & 50              & Ne      \\
+    982.83      & 635.18          & 0.00158         & 692.94     & 1000            & Ne      \\
+    1013.238    & 834.96          & 0.00133         & 705.91     & 100             & Ne      \\
+    1134.814    & 80.86           & 0.00923         & 748.87     & 300             & Ne      \\
+    \hline
+    \end{tabular}
+    \end{center}
+\caption{Centroid pixels for the Ocean Optics Helium and Neon calibration spectra. The corresponding wavelengths for each emission are matched by comparison to lines from the NIST atomic line database. Units for centroid intensity are ADU, and wavelengths are in nm.} \label{table:oceanlab_centroids}
+\end{table}
 
 \begin{table}[H]
     \begin{center}
     \begin{tabular}{|c|c|c|c|c|}
     \hline
-    spec\_pixel & spec\_intensity (ADU) & nist\_wave (nm) & nist\_intensity & gas element \\
+    centroid pixel & centroid intensity & centroid error & ref wave & gas molecule \\
     \hline \hline
-    132.3649283 & 236.48          & 388        & 60-300          & He      \\
-    288.9587617 & 249.46          & 447        & 25-200          & He      \\
-    412.1908462 & 98.46           & 492        & 20              & He      \\
-    437.7643945 & 271.16          & 501        & 100             & He      \\
-    677.5521828 & 3106.25         & 588        & 120-500         & He      \\
-    908.0143522 & 564.74          & 668        & 200             & He      \\
-    1021.697778 & 867.6           & 706        & 20-100          & He      \\
-    673.712     & 1696.45         & 585.25     & 200             & Ne      \\
-    700.126     & 617.38          & 594.48     & 50              & Ne      \\
-    722.492     & 181.31          & 602.99     & 100             & Ne      \\
-    747.974     & 1339.68         & 614.3      & 100             & Ne      \\
-    775.796     & 290.88          & 621.73     & 100             & Ne      \\
-    820.02      & 3428.72         & 640.22     & 200             & Ne      \\
-    860.822     & 1265.04         & 650.65     & 150             & Ne      \\
-    886.09      & 419.28          & 659.9      & 100             & Ne      \\
-    913.44      & 767.24          & 667.82     & 50              & Ne      \\
-    982.83      & 635.18          & 692.94     & 1000            & Ne      \\
-    1013.238    & 834.96          & 705.91     & 100             & Ne      \\
-    1134.814    & 80.86           & 748.87     & 300             & Ne      \\
+    23.50092286 & 30772.15763     & 0.000285       & 326.105   & HeHgCd \\
+    184.1577234 & 37829.79081     & 3.10E-05       & 361.051   & HeHgCd \\
+    229.5492333 & 40120.66215     & 0.000152       & 365.015   & HeHgCd \\
+    477.9985327 & 11444.21891     & 4.00E-05       & 404.656   & HeHgCd \\
+    639.6619601 & 30172.47648     & 1.60E-05       & 435.833   & HeHgCd \\
+    949.4331504 & 35609.38425     & 1.60E-05       & 479.992   & HeHgCd \\
+    1257.08592  & 5622.686548     & 1.00E-04       & 505.882   & HeHgCd \\
+    1372.254406 & 10136.48802     & 6.60E-05       & 546.074   & HeHgCd \\
+    1638.903321 & 10132.41605     & 7.80E-05       & 587.562   & HeHgCd \\
     \hline
     \end{tabular}
     \end{center}
+\caption{Centroid pixels for the KAST HeHgCd arclamp calibration spectrum. The corresponding wavelengths for each emission are matched by comparison to template spectrum found on the Lick Observatory website. Units for centroid intensity are ADU, and wavelengths are in nm.} \label{table:kast_centroids}
 \end{table}
 
-\begin{table}[H]
-    \begin{center}
-    \begin{tabular}{|c|c|c|c|}
-    \hline
-    spec\_pixel & spec\_intensity & ref\_wave & gas molecule \\
-    \hline \hline
-    23.50092286 & 30772.15763     & 326.105   & HeHgCd  \\
-    184.1577234 & 37829.79081     & 361.051   & HeHgCd  \\
-    229.5492333 & 40120.66215     & 365.015   & HeHgCd  \\
-    477.9985327 & 11444.21891     & 404.656   & HeHgCd  \\
-    639.6619601 & 30172.47648     & 435.833   & HeHgCd  \\
-    949.4331504 & 35609.38425     & 479.992   & HeHgCd  \\
-    1257.08592  & 5622.686548     & 505.882   & HeHgCd  \\
-    1372.254406 & 10136.48802     & 546.074   & HeHgCd  \\
-    1638.903321 & 10132.41605     & 587.562   & HeHgCd  \\
-    \hline
-    \end{tabular}
-    \end{center}
-\end{table}
 
+\subsection{Wavelength Solution}
 
 
 % ==================================
@@ -210,19 +234,21 @@ As seen in Figure , the solar spectrum and lamp spectrum show the approximate pr
 
 % ==================================
 \section{Conclusion}
+In conclusion we find the wavelength solution for the Ocean Optics spectrometer to be
 
+However further analysis into the physics of the solar or lamp spectra taken on the Ocean Optics spectrograph would require correcting for detector biases.
 
 % ==================================
 \section{Author Contributions}
 This project was done in collaboration with Julian Beas-Gonzalez and Russell Van-Linge (Group
-E), and we divided the tasks for this lab. I worked on writing a routine to isolate arrays that contain emission features in the gas lamp spectra, match lines to the Helium and HeHgCd spectra, and perform and apply the wavelength calibration using linear regression. Julian worked on computing the centroids and errors (including improving the code to get sub-pixel centroids), and matching lines to the Neon spectrum for calibration. Russell worked on reducing the 2D KAST images (bias subtraction, normalization, and slicing) to produce 1D spectra, and tested alternative centroid identification methods. Besides manually matching arclamp centroids to NIST/template spectrum, our code is fully automated.
+E), and we divided the tasks for this lab. I worked on writing a routine to isolate arrays that contain emission features in the gas lamp spectra, match lines to the Helium and HeHgCd spectra, and applied the wavelength calibration using linear regression. Julian worked on computing the centroids and errors, and matching lines to the Neon spectrum for calibration. Russell worked on reducing the 2D KAST images (bias subtraction, normalization, and slicing) to produce 1D spectra, and tested alternative centroid identification methods. Besides manually matching arclamp centroids to NIST/template spectrum, our code is mostly automated.
 
 % ===================
 % Figures
 \begin{figure}[H]
 \begin{center}
 \includegraphics[width=.8\linewidth]{plots/kast_science_imgs.png} 
-\caption{Bias-subtracted, normalized, 2D images of three different spectra taken on the KAST spectrograph: BD+15233, Feige 110, and J0047+0319. X-axis shows the wavelength dimension, y-axis shows the spatial dimension. Horizontal white line marks the source, and vertical white lines mark emission features in Earth's atmosphere. Dark bands across the source are absorption features.} \label{fig:science_images}
+\caption{Bias-subtracted, normalized, 2D images of three different spectra taken on the KAST spectrograph: BD+15233, Feige 110, and J0047+0319. X-axis shows the wavelength dimension, y-axis shows the spatial dimension. Horizontal white line marks the source, and vertical white lines mark emission features in Earth's atmosphere. Dark bands across the source are absorption features, due to electron transitions from atoms/molecules in both the star's atmosphere and Earth's atmosphere.} \label{fig:science_images}
 \end{center}
 \end{figure}
 
@@ -235,7 +261,7 @@ E), and we divided the tasks for this lab. I worked on writing a routine to isol
 \includegraphics[width=.49\linewidth]{plots/oceanlab_neon_centroids.png} \\
 \includegraphics[width=.49\linewidth]{plots/kast_arclamp_thres.png} \\
 \includegraphics[width=.49\linewidth]{plots/kast_arclamp_centroids.png} 
-\caption{Centroid finding routine.} \label{fig:centoid}
+\caption{Centroid finding routine applied to the Helium, Neon, and HeHgCd arclamp emission spectra.} \label{fig:centoid}
 \end{center}
 \end{figure}
 
