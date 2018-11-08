@@ -28,7 +28,11 @@ In this lab...
 \bigskip
 
 \section{Introduction} 
-Astronomical spectroscopy, components of spectrographs, types of spectrographs
+% Astronomical spectroscopy, components of spectrographs, types of spectrographs
+Kirchoff's laws of spectral formation state that there are three different types of 
+
+Section \ref{sec:observations} covers the schematics and specifications of two different spectrographs: the Ocean Lab spectrometer, and the KAST spectrograph mounted on the Shane 3m Telescope on Lick Observatory.
+
 
 % ==================================
 \section{Observations} \label{sec:observations}
@@ -39,6 +43,30 @@ Describe ocean lab and KAST spectrographs specifications and diagrams
 Centroid routine, wavelength calibration, centroid error and calibration error
 
 Bias subtraction and normalization
+\begin{equation}
+\begin{bmatrix}
+    m \\ c
+\end{bmatrix}
+= 
+\begin{bmatrix}
+    \sum x_i^2 & \sum x_i \\
+    \sum x_i & N
+\end{bmatrix}^{-1}
+\begin{bmatrix}
+    \sum x_i y_i \\ \sum y_i
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+    \sigma^2 = \frac{1}{N-2}\sum_i [y_i - (mx_i + c)]^2
+\end{equation}
+\begin{equation}
+    \sigma_m^2 = \frac{N\sigma^2}{N\sum_i x_i^2 - \left(\sum_i x_i \right)^2}
+\end{equation}
+\begin{equation}
+    \sigma_c^2 = \frac{\sigma^2 \sum_i x_i^2}{N\sum_i x_i^2 - \left(\sum_i x_i \right)^2}
+\end{equation}
+
 % \begin{figure}[H]
 % \plotone{plots/helium_reference.png}
 % \caption{\href{https://www.vernier.com/innovate/a-quantitative-investigation-of-the-helium-spectrum/}{https://www.vernier.com/innovate/a-quantitative-investigation-of-the-helium-spectrum/}} \label{fig:bias}
@@ -48,6 +76,57 @@ Bias subtraction and normalization
 \section{Data Analysis \& Modeling} \label{sec:analysis}
 Show centroids, wavelength calibration plots, application of wavelength solution, plots of astronomical spectra
 
+\begin{table}[H]
+    \begin{center}
+    \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    spec\_pixel & spec\_intensity (ADU) & nist\_wave (nm) & nist\_intensity & element \\
+    \hline \hline
+    132.3649283 & 236.48          & 388        & 60-300          & He      \\
+    288.9587617 & 249.46          & 447        & 25-200          & He      \\
+    412.1908462 & 98.46           & 492        & 20              & He      \\
+    437.7643945 & 271.16          & 501        & 100             & He      \\
+    677.5521828 & 3106.25         & 588        & 120-500         & He      \\
+    908.0143522 & 564.74          & 668        & 200             & He      \\
+    1021.697778 & 867.6           & 706        & 20-100          & He      \\
+    673.712     & 1696.45         & 585.25     & 200             & Ne      \\
+    700.126     & 617.38          & 594.48     & 50              & Ne      \\
+    722.492     & 181.31          & 602.99     & 100             & Ne      \\
+    747.974     & 1339.68         & 614.3      & 100             & Ne      \\
+    775.796     & 290.88          & 621.73     & 100             & Ne      \\
+    820.02      & 3428.72         & 640.22     & 200             & Ne      \\
+    860.822     & 1265.04         & 650.65     & 150             & Ne      \\
+    886.09      & 419.28          & 659.9      & 100             & Ne      \\
+    913.44      & 767.24          & 667.82     & 50              & Ne      \\
+    982.83      & 635.18          & 692.94     & 1000            & Ne      \\
+    1013.238    & 834.96          & 705.91     & 100             & Ne      \\
+    1134.814    & 80.86           & 748.87     & 300             & Ne      \\
+    \hline
+    \end{tabular}
+    \end{center}
+\end{table}
+
+\begin{table}[H]
+    \begin{center}
+    \begin{tabular}{|c|c|c|}
+    \hline
+    spec\_pixel & spec\_intensity & ref\_wave \\
+    \hline \hline
+    23.50092286 & 30772.15763     & 326.105   \\
+    184.1577234 & 37829.79081     & 361.051   \\
+    229.5492333 & 40120.66215     & 365.015   \\
+    477.9985327 & 11444.21891     & 404.656   \\
+    639.6619601 & 30172.47648     & 435.833   \\
+    949.4331504 & 35609.38425     & 479.992   \\
+    1257.08592  & 5622.686548     & 505.882   \\
+    1372.254406 & 10136.48802     & 546.074   \\
+    1638.903321 & 10132.41605     & 587.562   \\
+    \hline
+    \end{tabular}
+    \end{center}
+\end{table}
+
+% ===================
 \begin{figure}[]
 \begin{center}
 \includegraphics[width=.49\linewidth]{plots/oceanlab_helium_thres.png}
@@ -60,19 +139,55 @@ Show centroids, wavelength calibration plots, application of wavelength solution
 
 \begin{figure}[]
 \begin{center}
+\includegraphics[width=.49\linewidth]{plots/kast_arclamp_thres.png} \\
+\includegraphics[width=.49\linewidth]{plots/kast_arclamp_centroids.png} 
+\caption{Centroid finding routine.}
+\end{center}
+\end{figure}
+
+% ===================
+\begin{figure}[]
+\begin{center}
 \includegraphics[width=.46\linewidth]{plots/oceanlab_wavecal.png}
 \includegraphics[width=.46\linewidth]{plots/oceanlab_residual.png}
 \caption{Wavelength calibration for the Ocean Lab spectrometer.}
 \end{center}
 \end{figure}
 
+\begin{figure}[]
+\begin{center}
+\includegraphics[width=.46\linewidth]{plots/kast_wavecal.png}
+\includegraphics[width=.46\linewidth]{plots/kast_residual.png}
+\caption{Wavelength calibration for the KAST spectrometer.}
+\end{center}
+\end{figure}
 
+% ===================
+\begin{figure}[]
+\begin{center}
+\includegraphics[width=.46\linewidth]{plots/oceanlab_error_vs_intensity2.png}
+\includegraphics[width=.46\linewidth]{plots/oceanlab_error_vs_intensity.png}
+\caption{Error vs. Intensity.}
+\end{center}
+\end{figure}
+
+% ===================
+% Science images
 \begin{figure}[]
 \begin{center}
 \includegraphics[width=.31\linewidth]{plots/oceanlab_solar.png}
 \includegraphics[width=.31\linewidth]{plots/oceanlab_fluorescent.png}
 \includegraphics[width=.31\linewidth]{plots/oceanlab_lamp.png}
 \caption{Three spectra taken on the Ocean Lab Spectrometer: the Sun, a fluorescent light bulb, and an incandescent lamp. Wavelength scale determined by calibration with emission peaks in Helium and Neon lamps.}
+\end{center}
+\end{figure}
+
+\begin{figure}[]
+\begin{center}
+\includegraphics[width=.31\linewidth]{plots/kast_bd15233.png}
+\includegraphics[width=.31\linewidth]{plots/kast_feige110.png}
+\includegraphics[width=.31\linewidth]{plots/kast_j00470319.png}
+\caption{Three astronomical spectra taken on the KAST spectrograph.}
 \end{center}
 \end{figure}
 
@@ -107,6 +222,12 @@ What kind of astronomical sources
 \hrule
 \begin{lstlisting}
 def emission(data, **kwargs):
+    """
+    Input:  'data': 2D array [x,y]
+            'thres': standard deviation threshold
+    Output: 'emission': an array of arrays which contain the index of 
+                each emission which lies above some threshold cut
+    """
     thres = kwargs.get('thres', 1)
     
     x, y = np.array(data[0]), np.array(data[1])
@@ -134,29 +255,10 @@ def emission(data, **kwargs):
 
 return np.array(emission)
 
-
-def centroid(data, feat_idx, **kwargs):
-    
-    x, y = np.array(data[0]), np.array(data[1])
-    Npix = len(x)
-    
-    max_idx = []
-    for feat in feat_idx:
-        for idx in feat:
-            if y[idx] == max(y[feat]):
-                max_idx.append(idx)
-                
-    return np.array(max_idx)
-
-centroid(data, emiss)
-\end{lstlisting}
-\hrule \vspace{7pt}
-
-\subsection{Centroid Error} \label{code:stats}
-\small
-\hrule
-\begin{lstlisting}
-#Produces float values for the centroids, calculating their error and width
+"""
+Produces float values for the centroids, calculating their error and width
+Credit: Julian
+"""
 centroids, errors, widths, intensities = [], [], [], []
 for i in np.arange(len(cent)):
     inte = []
@@ -173,17 +275,110 @@ for i in np.arange(len(cent)):
 \end{lstlisting}
 \hrule \vspace{7pt}
 
+
 \subsection{Wavelength Calibration} \label{code:stats}
 \small
 \hrule
 \begin{lstlisting}
 def linear_regression(x, y):
-    
+    """
+    Input:  x, y: 1D arrays
+    Output: [m, c], [m_err, c_err]: slope and intercept best fit and error
+    """
+    N = len(x)
+    x, y = np.array(x), np.array(y)
+
     A = np.array([[np.sum(x**2), np.sum(x)], \
-                  [np.sum(x), len(x)]])
+                  [np.sum(x), N]])
     a = np.array([np.sum(x*y), np.sum(y)])
 
-    return np.dot(np.linalg.inv(A), a)
+    fit = np.dot(np.linalg.inv(A), a)
+
+    sig_sq = np.sum(y - (fit[0]*x + fit[1]))**2/(N + 2)
+    m_err = np.sqrt(N*sig_sq/(N*np.sum(x**2) - (np.sum(x))**2))
+    c_err = np.sqrt(sig_sq*np.sum(x**2)/(N*np.sum(x**2) - (np.sum(x))**2))
+    err = np.array([m_err, c_err])
+
+    return fit, err
+\end{lstlisting}
+\hrule \vspace{7pt}
+
+
+\subsection{KAST Data Reduction} \label{code:stats}
+\small
+\hrule
+\begin{lstlisting}
+"""
+Credit: Russell
+"""
+def readData(folder):
+    '''
+    Reads all the fits files in a folder and creates a 3D array
+    '''
+    files = os.listdir(folder)
+    array3D = []
+    for ff in files:
+        arr = fits.getdata(folder+ff,ignore_missing_end=True)
+        array3D.append(arr)
+    return np.array(array3D)
+
+def combineFrame(data_array):
+    '''
+    Avergaes the 3D into 2D array
+    '''
+    return np.median(data_array,axis=0)
+
+def slit_size(data = 'fits_file'):
+    '''
+    takes a fits file and finds the slit sized used
+    '''
+    dt = fits.open(data)
+    header = dt[0].header
+    print(header['SLIT_N'])
+    
+    
+def norm_flat(bias_folder,flat_folder):
+    '''
+    Input the bias and flat folders and creates
+    bias,flats, and normalized flats
+    '''
+    flat3d = readData(flat_folder)
+    bias3d = readData(bias_folder)
+
+    flat2d = combineFrame(flat3d)
+    bias2d = combineFrame(bias3d)
+
+    norm_flat = (flat2d-bias2d)/np.median(flat2d-bias2d)
+    return norm_flat,flat2d,bias2d
+
+def science_image(science_folder,flat_folder,bias_folder):
+    '''
+    Creates a science image and outputs the 2D array to be used to make spectra
+    '''
+    # create flats and bias
+    normflat, flat, bias = norm_flat(bias_folder,flat_folder) 
+
+    science_3d = readData(science_folder) # reducing down to 2d 
+    science_2d = combineFrame(science_3d)
+    science_final = (science_2d - bias)/normflat # subtracting bias and normalizing
+    # Plots the science image
+    plt.imshow(science_final,origin='lower',interpolation='nearest',\
+        cmap='gray',vmin=10,vmax=1000)
+    plt.show()
+    return science_final
+
+def science_spectra(science_2d,start_slice,end_slice,file_name='file_name'):
+    '''
+    Creates a spectra by slicing up the science image at the input spatial
+    pixels, saves array, and outputs plot
+    '''
+    spectra = np.mean(science_2d[start_slice:end_slice,:],axis=0)
+    spectra = spectra[spectra>0]
+    x = np.arange(0,len(spectra))
+    plt.plot(x,spectra,color='black')
+    plt.show()
+    np.save('%s_spectra'%file_name,science_2d)
+    return spectra
 \end{lstlisting}
 \hrule \vspace{7pt}
 
